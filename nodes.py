@@ -139,33 +139,15 @@ def agent_tool_loop(state: ReviewState) -> dict:
     return {"issues_found": all_issues}
 
 def classify_severity(state: ReviewState) -> dict:
-    print("\n[NODE] classify_severity — labeling issue severity...")
+    print("\n[NODE] classify_severity — running fine-tuned model...")
+
+    # Import here to avoid loading model at startup if not needed
+    from classifier import classify
+
     labels = []
-
     for issue in state["issues_found"]:
-        desc = issue["description"].lower()
-        tool = issue["source_tool"]
-        label = "suggestion"  # default
-
-        if tool == "static_analysis_tool":
-            # pylint error codes: E = error (critical), W = warning
-            if " e" in desc or "error" in desc or "division" in desc or "syntax" in desc:
-                label = "critical"
-            elif " w" in desc or "warning" in desc:
-                label = "warning"
-
-        elif tool == "test_coverage_tool":
-            if "untested" in desc or "no tests found" in desc:
-                label = "warning"
-            else:
-                label = "suggestion"
-
-        elif tool == "docs_fetch_tool":
-            if "injection" in desc or "caution" in desc or "avoid" in desc:
-                label = "warning"
-            else:
-                label = "suggestion"
-
+        label = classify(issue["description"])
+        print(f"  → '{issue['description'][:60]}...' → {label}")
         labels.append(label)
 
     print(f"  Labels: {labels}")
