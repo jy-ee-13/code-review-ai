@@ -1,0 +1,11 @@
+# sample_reviews/sample2.diff
+--- a/utils.py
++++ b/utils.py
+@@ -0,0 +1,10 @@
++def calculate_discount(price, pct):
++    x = price * pct / 100
++    return x
++
++def send_email(addr, msg):
++    import smtplib
++    pass

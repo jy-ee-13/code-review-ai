@@ -1,0 +1,14 @@
+# sample_reviews/sample1.diff
+--- a/auth.py
++++ b/auth.py
+@@ -1,5 +1,12 @@
++import subprocess
++import os
++
++def run_command(user_input):
++    cmd = "ls " + user_input
++    subprocess.call(cmd, shell=True)
++
++def get_password():
++    password = "admin123"
++    return password
