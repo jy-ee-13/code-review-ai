@@ -10,38 +10,41 @@ Starting CodeReview AI pipeline...
 
 [NODE] agent_tool_loop - agent reasoning over diff with tools...
  Agent iterations 1...
- -> Calling tool: static_analysis_tool({'code_snippet': 'def format_name(first, last):\n    return f"{first} {last}".strip()\ndef is_valid_age(age):\n    return isinstance(age, int) and 0 <= age <= 120'}) 
- Result: Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
--------------------------------...
+ -> Calling tool: static_analysis_tool({'code_snippet': 'def format_name(first, last):\n    return f"{first} {last}".strip()\n\ndef is_valid_age(age):\n    return isinstance(age, int) and 0 <= age <= 120'}) 
+ Result: No issues found...
  Agent iterations 2...
+ -> Calling tool: test_coverage_tool({'function_name': 'format_name'}) 
+ Result: No test files found in project. Function 'format_name' is untested....
+ Agent iterations 3...
+ -> Calling tool: test_coverage_tool({'function_name': 'is_valid_age'}) 
+ Result: No test files found in project. Function 'is_valid_age' is untested....
+ Agent iterations 4...
  Agent finished reasoning.
- Total issues found: 1
+ Total issues found: 2
 
 [NODE] classify_severity — running fine-tuned model...
 [Classifier] Loading fine-tuned severity model...
-Loading weights:   0%|          | 0/451 [00:00<?, ?it/s]Loading weights:   0%|          | 1/451 [00:00<01:11,  6.32it/s]Loading weights:  11%|█         | 49/451 [00:00<00:01, 226.83it/s]Loading weights:  17%|█▋        | 77/451 [00:00<00:01, 212.37it/s]Loading weights:  22%|██▏       | 101/451 [00:00<00:02, 162.40it/s]Loading weights:  27%|██▋       | 120/451 [00:00<00:02, 159.39it/s]Loading weights:  31%|███       | 138/451 [00:00<00:02, 130.93it/s]Loading weights:  36%|███▌      | 161/451 [00:01<00:02, 143.23it/s]Loading weights:  39%|███▉      | 177/451 [00:01<00:02, 117.16it/s]Loading weights:  45%|████▌     | 203/451 [00:01<00:01, 133.32it/s]Loading weights:  51%|█████     | 231/451 [00:01<00:01, 134.00it/s]Loading weights:  57%|█████▋    | 259/451 [00:01<00:01, 143.40it/s]Loading weights:  64%|██████▎   | 287/451 [00:01<00:01, 145.33it/s]Loading weights:  67%|██████▋   | 303/451 [00:02<00:01, 145.23it/s]Loading weights:  71%|███████   | 318/451 [00:02<00:01, 125.14it/s]Loading weights:  73%|███████▎  | 331/451 [00:02<00:01, 86.53it/s] Loading weights:  76%|███████▌  | 343/451 [00:02<00:01, 86.90it/s]Loading weights:  82%|████████▏ | 371/451 [00:02<00:00, 111.59it/s]Loading weights:  85%|████████▌ | 385/451 [00:03<00:00, 107.86it/s]Loading weights:  88%|████████▊ | 399/451 [00:03<00:00, 104.82it/s]Loading weights:  92%|█████████▏| 413/451 [00:03<00:00, 111.80it/s]Loading weights:  95%|█████████▍| 427/451 [00:03<00:00, 109.82it/s]Loading weights:  98%|█████████▊| 441/451 [00:03<00:00, 109.26it/s]Loading weights: 100%|██████████| 451/451 [00:03<00:00, 127.12it/s]
+Loading weights:   0%|          | 0/451 [00:00<?, ?it/s]Loading weights:   0%|          | 1/451 [00:00<01:27,  5.13it/s]Loading weights:  14%|█▍        | 65/451 [00:00<00:01, 268.16it/s]Loading weights:  23%|██▎       | 105/451 [00:00<00:01, 285.75it/s]Loading weights:  31%|███       | 139/451 [00:00<00:01, 254.62it/s]Loading weights:  37%|███▋      | 168/451 [00:00<00:01, 261.91it/s]Loading weights:  44%|████▎     | 197/451 [00:00<00:00, 267.93it/s]Loading weights:  50%|█████     | 226/451 [00:00<00:01, 222.05it/s]Loading weights:  56%|█████▌    | 251/451 [00:01<00:00, 203.53it/s]Loading weights:  61%|██████    | 273/451 [00:01<00:00, 206.23it/s]Loading weights:  67%|██████▋   | 301/451 [00:01<00:00, 198.95it/s]Loading weights:  71%|███████▏  | 322/451 [00:01<00:00, 193.69it/s]Loading weights:  76%|███████▌  | 342/451 [00:01<00:00, 190.04it/s]Loading weights:  80%|████████  | 362/451 [00:01<00:00, 130.23it/s]Loading weights:  85%|████████▌ | 385/451 [00:02<00:00, 123.54it/s]Loading weights:  89%|████████▊ | 400/451 [00:02<00:00, 120.46it/s]Loading weights:  92%|█████████▏| 414/451 [00:02<00:00, 119.93it/s]Loading weights:  95%|█████████▍| 427/451 [00:02<00:00, 114.38it/s]Loading weights:  98%|█████████▊| 441/451 [00:02<00:00, 84.82it/s] Loading weights: 100%|██████████| 451/451 [00:02<00:00, 162.60it/s]
 [1mPhiForSequenceClassification LOAD REPORT[0m from: microsoft/phi-2
 Key            | Status     | 
 ---------------+------------+-
-lm_head.bias   | UNEXPECTED | 
 lm_head.weight | UNEXPECTED | 
+lm_head.bias   | UNEXPECTED | 
 score.weight   | MISSING    | 
 
 Notes:
 - UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
 - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
 [Classifier] Model ready.
-  → 'Your code has been rated at 10.00/10 (previous run: 10.00/10...' → critical
-  Labels: ['critical']
-
-[NODE] block_merge_recommendation - critical issue found, recommending block...
+  → 'No test files found in project. Function 'format_name' is un...' → warning
+  → 'No test files found in project. Function 'is_valid_age' is u...' → warning
+  Labels: ['warning', 'warning']
 
 [NODE] format_output — assembling final review...
 ==== CODE REVIEW REPORT ====
-
-⛔ MERGE BLOCKED: Critical issues must be resolved first.
-🔴 [CRITICAL] Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
----------------------------------------------------
-   Source: static_analysis_tool
+🟡 [WARNING] No test files found in project. Function 'format_name' is untested.
+   Source: test_coverage_tool
+🟡 [WARNING] No test files found in project. Function 'is_valid_age' is untested.
+   Source: test_coverage_tool
 
 ===== PIPELINE COMPLETE =====

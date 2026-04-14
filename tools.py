@@ -7,7 +7,8 @@ from langchain_core.tools import tool
 def static_analysis_tool(code_snippet: str) -> str:
     """
     Analyzes a Python code snippet for syntax errors, undefined variables,
-    and common bugs. Use this whenever the diff contains Python code changes.
+    security vulnerabilities, and common bugs. Use this whenever the diff
+    contains Python code changes.
     Returns a list of issues found, or 'No issues found' if the code is clean.
     """
     issues = []
@@ -17,35 +18,54 @@ def static_analysis_tool(code_snippet: str) -> str:
         ast.parse(code_snippet)
     except SyntaxError as e:
         issues.append(f"Syntax error at line {e.lineno}: {e.msg}")
-    
-    # Check 2: Run pylint on the snippet via a temp file
+
+    # Check 2: Security pattern detection  ← NEW BLOCK
+    security_patterns = [
+        ("shell=True", "Shell injection risk: subprocess called with shell=True and user input"),
+        ("password", "Hardcoded credential detected: variable named 'password' found in code"),
+        ("secret", "Hardcoded credential detected: variable named 'secret' found in code"),
+        ("api_key", "Hardcoded credential detected: variable named 'api_key' found in code"),
+        ("eval(", "Code injection risk: eval() executes arbitrary code"),
+        ("exec(", "Code injection risk: exec() executes arbitrary code"),
+        ("pickle.loads", "Deserialization risk: pickle.loads can execute arbitrary code"),
+        ("md5(", "Weak cryptography: MD5 is cryptographically broken"),
+        ("sha1(", "Weak cryptography: SHA1 is cryptographically broken"),
+        ("except:", "Bare except clause silences all errors including system exits"),
+        ("except Exception:", "Overly broad exception handling hides real errors"),
+    ]
+
+    lines = code_snippet.splitlines()
+    for i, line in enumerate(lines, 1):
+        for pattern, message in security_patterns:
+            if pattern in line:
+                issues.append(f"line {i}: {message}")
+
+    # Check 3: Run pylint for undefined variables and errors
     try:
-        with open("/tmp/_review_snippet.py","w") as f:
+        with open("/tmp/_review_snippet.py", "w") as f:
             f.write(code_snippet)
 
         result = subprocess.run(
             ["pylint", "/tmp/_review_snippet.py",
              "--disable=all",
-             "--enable=E",    #errors only
+             "--enable=E",
              "--output-format=text",
-             "--source=no"],
-             capture_output=True, text=True, timeout=10
+             "--score=no"],
+            capture_output=True, text=True, timeout=10
         )
         pylint_output = result.stdout.strip()
-
-        # Filter out lines that are just the module header or blank
         meaningful_lines = [
             line.replace("/tmp/_review_snippet.py", "reviewed file")
             for line in pylint_output.splitlines()
             if line.strip()
             and not line.startswith("***")
             and not line.startswith("---")
+            and not line.startswith("Your code has been rated")
+            and not line.startswith("------")
         ]
         if meaningful_lines:
             issues.append("\n".join(meaningful_lines))
 
-        if pylint_output:
-            issues.append(pylint_output)
     except Exception as e:
         issues.append(f"pylint unavailable: {str(e)}")
 
@@ -110,6 +130,7 @@ def docs_fetch_tool(library_name: str) -> str:
         "pytest": "Testing framework. Ensure fixtures are properly scoped and teardown is handled.",
         "json": "Standard library JSON encoder/decoder. Watch for unhandled JSONDecodeError.",
         "re": "Regular expressions. Complex patterns can cause catastrophic backtracking.",
+        "smtplib": "Email sending library. Never hardcode credentials; always use environment variables for passwords.",
     }
 
     name = library_name.lower().strip()

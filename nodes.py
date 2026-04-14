@@ -77,15 +77,18 @@ def agent_tool_loop(state: ReviewState) -> dict:
         hunk_summary += f"Imports used: {h['imports_added']}\n"
 
     messages = [
-        SystemMessage(content="""You are a senior code reviewer. 
-                      You have three tools available:
-                      - static_analysis_tool: use on any Python code snippet to find bugs and errors
-                      - test_coverage_tool: use on any function name to check if it has tests
-                      - docs_fetch_tool: use on any library name to check if it's being used safely
+        SystemMessage(content="""You are a senior security-focused code reviewer.
+            You have three tools:
+            - static_analysis_tool: run on ANY Python code snippet to find bugs and errors
+            - test_coverage_tool: run on ANY function name that was added or changed
+            - docs_fetch_tool: run on EVERY library import found in the diff
 
-                      Review the diff below. Call the appropriate tools. Be selective - only call a tool when it will
-                      reveal useful information. After calling tools, summarize what issues you found.
-                      """),
+            Your review strategy — follow this order:
+            1. ALWAYS call static_analysis_tool on the full code snippet first
+            2. ALWAYS call test_coverage_tool for every function defined in the diff
+            3. ALWAYS call docs_fetch_tool for every library imported in the diff
+
+            Be thorough. Every function needs a test check. Every import needs a docs check."""),
                       HumanMessage(content=f"Review this diff:\n{hunk_summary}")
     ]
 
@@ -119,7 +122,11 @@ def agent_tool_loop(state: ReviewState) -> dict:
                 print(f" Result: {result[:100]}...") # print first 100 chars
 
                 # Convert tool result into an Issue if it found something real
-                if "No issues found" not in result and "Tests found" not in result:
+                if (result.strip()
+                    and "No issues found" not in result
+                    and "Tests found" not in result
+                    and "rated at 10.00/10" not in result   # NEW
+                    and "rated at" not in result):          # NEW
                     all_issues.append({
                         "description": result[:200],
                         "location": f"detected by {tool_name}",

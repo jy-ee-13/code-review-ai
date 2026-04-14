@@ -10,37 +10,43 @@ Starting CodeReview AI pipeline...
 [NODE] agent_tool_loop - agent reasoning over diff with tools...
  Agent iterations 1...
  -> Calling tool: static_analysis_tool({'code_snippet': 'def calculate_discount(price, pct):\n    x = price * pct / 100\n    return x\ndef send_email(addr, msg):\n    import smtplib\n    pass'}) 
- Result: Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
--------------------------------...
+ Result: No issues found...
+ -> Calling tool: test_coverage_tool({'function_name': 'calculate_discount'}) 
+ Result: No test files found in project. Function 'calculate_discount' is untested....
+ -> Calling tool: test_coverage_tool({'function_name': 'send_email'}) 
+ Result: No test files found in project. Function 'send_email' is untested....
+ -> Calling tool: docs_fetch_tool({'library_name': 'smtplib'}) 
+ Result: smtplib: Email sending library. Never hardcode credentials; always use environment variables for pas...
  Agent iterations 2...
  Agent finished reasoning.
- Total issues found: 1
+ Total issues found: 3
 
 [NODE] classify_severity — running fine-tuned model...
 [Classifier] Loading fine-tuned severity model...
-Loading weights:   0%|          | 0/451 [00:00<?, ?it/s]Loading weights:   0%|          | 1/451 [00:00<01:04,  6.95it/s]Loading weights:  11%|█         | 49/451 [00:00<00:01, 232.42it/s]Loading weights:  17%|█▋        | 77/451 [00:00<00:01, 243.53it/s]Loading weights:  23%|██▎       | 105/451 [00:00<00:01, 237.43it/s]Loading weights:  29%|██▉       | 133/451 [00:00<00:01, 247.56it/s]Loading weights:  36%|███▌      | 161/451 [00:00<00:01, 244.65it/s]Loading weights:  42%|████▏     | 189/451 [00:00<00:01, 243.90it/s]Loading weights:  48%|████▊     | 217/451 [00:00<00:00, 237.33it/s]Loading weights:  55%|█████▍    | 247/451 [00:01<00:00, 249.98it/s]Loading weights:  64%|██████▎   | 287/451 [00:01<00:00, 269.56it/s]Loading weights:  70%|██████▉   | 315/451 [00:01<00:00, 185.57it/s]Loading weights:  75%|███████▍  | 337/451 [00:01<00:00, 180.81it/s]Loading weights:  79%|███████▉  | 358/451 [00:01<00:00, 129.76it/s]Loading weights:  83%|████████▎ | 375/451 [00:02<00:00, 93.23it/s] Loading weights:  86%|████████▌ | 388/451 [00:02<00:00, 91.88it/s]Loading weights:  89%|████████▊ | 400/451 [00:02<00:00, 89.90it/s]Loading weights:  92%|█████████▏| 413/451 [00:02<00:00, 83.43it/s]Loading weights:  95%|█████████▍| 427/451 [00:02<00:00, 89.15it/s]Loading weights:  98%|█████████▊| 441/451 [00:03<00:00, 88.94it/s]Loading weights: 100%|██████████| 451/451 [00:03<00:00, 148.70it/s]
+Loading weights:   0%|          | 0/451 [00:00<?, ?it/s]Loading weights:  11%|█         | 49/451 [00:00<00:00, 450.58it/s]Loading weights:  21%|██        | 95/451 [00:00<00:01, 313.97it/s]Loading weights:  29%|██▊       | 129/451 [00:00<00:01, 303.49it/s]Loading weights:  36%|███▌      | 161/451 [00:00<00:01, 242.38it/s]Loading weights:  41%|████▏     | 187/451 [00:00<00:01, 243.15it/s]Loading weights:  48%|████▊     | 217/451 [00:00<00:00, 252.85it/s]Loading weights:  54%|█████▍    | 245/451 [00:00<00:00, 232.53it/s]Loading weights:  61%|██████    | 273/451 [00:01<00:00, 236.87it/s]Loading weights:  66%|██████▌   | 298/451 [00:01<00:00, 198.89it/s]Loading weights:  71%|███████   | 320/451 [00:01<00:00, 170.04it/s]Loading weights:  76%|███████▌  | 343/451 [00:01<00:00, 147.63it/s]Loading weights:  80%|███████▉  | 360/451 [00:01<00:00, 142.21it/s]Loading weights:  83%|████████▎ | 375/451 [00:02<00:00, 80.27it/s] Loading weights:  86%|████████▌ | 387/451 [00:02<00:00, 66.67it/s]Loading weights:  88%|████████▊ | 399/451 [00:02<00:00, 64.70it/s]Loading weights:  92%|█████████▏| 413/451 [00:03<00:00, 55.88it/s]Loading weights:  95%|█████████▍| 427/451 [00:03<00:00, 62.57it/s]Loading weights: 100%|██████████| 451/451 [00:03<00:00, 135.38it/s]
 [1mPhiForSequenceClassification LOAD REPORT[0m from: microsoft/phi-2
 Key            | Status     | 
 ---------------+------------+-
-lm_head.weight | UNEXPECTED | 
 lm_head.bias   | UNEXPECTED | 
+lm_head.weight | UNEXPECTED | 
 score.weight   | MISSING    | 
 
 Notes:
 - UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
 - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
 [Classifier] Model ready.
-  → 'Your code has been rated at 10.00/10 (previous run: 10.00/10...' → critical
-  Labels: ['critical']
-
-[NODE] block_merge_recommendation - critical issue found, recommending block...
+  → 'No test files found in project. Function 'calculate_discount...' → warning
+  → 'No test files found in project. Function 'send_email' is unt...' → warning
+  → 'smtplib: Email sending library. Never hardcode credentials; ...' → suggestion
+  Labels: ['warning', 'warning', 'suggestion']
 
 [NODE] format_output — assembling final review...
 ==== CODE REVIEW REPORT ====
-
-⛔ MERGE BLOCKED: Critical issues must be resolved first.
-🔴 [CRITICAL] Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
----------------------------------------------------
-   Source: static_analysis_tool
+🟡 [WARNING] No test files found in project. Function 'calculate_discount' is untested.
+   Source: test_coverage_tool
+🟡 [WARNING] No test files found in project. Function 'send_email' is untested.
+   Source: test_coverage_tool
+🟢 [SUGGESTION] smtplib: Email sending library. Never hardcode credentials; always use environment variables for passwords.
+   Source: docs_fetch_tool
 
 ===== PIPELINE COMPLETE =====

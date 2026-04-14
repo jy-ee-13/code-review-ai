@@ -10,40 +10,54 @@ Starting CodeReview AI pipeline...
 
 [NODE] agent_tool_loop - agent reasoning over diff with tools...
  Agent iterations 1...
- -> Calling tool: static_analysis_tool({'code_snippet': 'import subprocess\nimport os\ndef run_command(user_input):\n    cmd = "ls " + user_input\n    subprocess.call(cmd, shell=True)\ndef get_password():\n    password = "admin123"\n    return password'}) 
- Result: Your code has been rated at 10.00/10 (previous run: 0.00/10, +10.00)
--------------------------------...
- Agent iterations 2...
+ -> Calling tool: static_analysis_tool({'code_snippet': 'import subprocess\nimport os\ndef run_command(user_input):\n    cmd = "ls " + user_input\n    subprocess.call(cmd, shell=True)\n\ndef get_password():\n    password = "admin123"\n    return password'}) 
+ Result: line 5: Shell injection risk: subprocess called with shell=True and user input
+line 7: Hardcoded cre...
  -> Calling tool: test_coverage_tool({'function_name': 'run_command'}) 
  Result: No test files found in project. Function 'run_command' is untested....
- Agent iterations 3...
+ -> Calling tool: test_coverage_tool({'function_name': 'get_password'}) 
+ Result: No test files found in project. Function 'get_password' is untested....
+ -> Calling tool: docs_fetch_tool({'library_name': 'subprocess'}) 
+ Result: subprocess: Spawn and manage subprocesses; use with caution — shell injection risk if inputs are uns...
+ -> Calling tool: docs_fetch_tool({'library_name': 'os'}) 
+ Result: os: Standard library for OS interaction: file paths, env vars, process management....
+ Agent iterations 2...
  Agent finished reasoning.
- Total issues found: 2
+ Total issues found: 5
 
 [NODE] classify_severity — running fine-tuned model...
 [Classifier] Loading fine-tuned severity model...
-Loading weights:   0%|          | 0/451 [00:00<?, ?it/s]Loading weights:   0%|          | 1/451 [00:00<01:37,  4.60it/s]Loading weights:  14%|█▍        | 63/451 [00:00<00:01, 223.24it/s]Loading weights:  20%|██        | 92/451 [00:00<00:01, 239.60it/s]Loading weights:  27%|██▋       | 120/451 [00:00<00:01, 228.13it/s]Loading weights:  33%|███▎      | 149/451 [00:00<00:01, 244.38it/s]Loading weights:  39%|███▉      | 176/451 [00:00<00:01, 242.41it/s]Loading weights:  45%|████▌     | 203/451 [00:00<00:01, 244.28it/s]Loading weights:  51%|█████     | 231/451 [00:01<00:00, 250.76it/s]Loading weights:  57%|█████▋    | 259/451 [00:01<00:00, 245.84it/s]Loading weights:  64%|██████▎   | 287/451 [00:01<00:00, 235.94it/s]Loading weights:  70%|██████▉   | 315/451 [00:01<00:00, 226.16it/s]Loading weights:  76%|███████▌  | 343/451 [00:01<00:00, 214.05it/s]Loading weights:  81%|████████  | 365/451 [00:01<00:00, 213.59it/s]Loading weights:  86%|████████▌ | 387/451 [00:02<00:00, 88.05it/s] Loading weights:  90%|████████▉ | 404/451 [00:02<00:00, 92.99it/s]Loading weights:  93%|█████████▎| 419/451 [00:02<00:00, 98.77it/s]Loading weights:  96%|█████████▌| 434/451 [00:02<00:00, 97.09it/s]Loading weights: 100%|██████████| 451/451 [00:02<00:00, 160.18it/s]
+Loading weights:   0%|          | 0/451 [00:00<?, ?it/s]Loading weights:   0%|          | 1/451 [00:00<01:10,  6.35it/s]Loading weights:  11%|█         | 49/451 [00:00<00:01, 230.90it/s]Loading weights:  17%|█▋        | 78/451 [00:00<00:01, 251.00it/s]Loading weights:  24%|██▎       | 107/451 [00:00<00:01, 241.21it/s]Loading weights:  30%|██▉       | 134/451 [00:00<00:01, 238.24it/s]Loading weights:  42%|████▏     | 189/451 [00:00<00:00, 297.73it/s]Loading weights:  52%|█████▏    | 233/451 [00:00<00:00, 332.67it/s]Loading weights:  61%|██████    | 273/451 [00:00<00:00, 346.47it/s]Loading weights:  70%|██████▉   | 315/451 [00:01<00:00, 326.22it/s]Loading weights:  77%|███████▋  | 349/451 [00:01<00:00, 214.40it/s]Loading weights:  83%|████████▎ | 376/451 [00:01<00:00, 197.61it/s]Loading weights:  89%|████████▊ | 400/451 [00:01<00:00, 160.51it/s]Loading weights:  93%|█████████▎| 420/451 [00:01<00:00, 151.72it/s]Loading weights:  97%|█████████▋| 438/451 [00:02<00:00, 152.68it/s]Loading weights: 100%|██████████| 451/451 [00:02<00:00, 193.18it/s]
 [1mPhiForSequenceClassification LOAD REPORT[0m from: microsoft/phi-2
 Key            | Status     | 
 ---------------+------------+-
-lm_head.bias   | UNEXPECTED | 
 lm_head.weight | UNEXPECTED | 
+lm_head.bias   | UNEXPECTED | 
 score.weight   | MISSING    | 
 
 Notes:
 - UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
 - MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
 [Classifier] Model ready.
-  → 'Your code has been rated at 10.00/10 (previous run: 0.00/10,...' → suggestion
+  → 'line 5: Shell injection risk: subprocess called with shell=T...' → warning
   → 'No test files found in project. Function 'run_command' is un...' → warning
-  Labels: ['suggestion', 'warning']
+  → 'No test files found in project. Function 'get_password' is u...' → warning
+  → 'subprocess: Spawn and manage subprocesses; use with caution ...' → warning
+  → 'os: Standard library for OS interaction: file paths, env var...' → warning
+  Labels: ['warning', 'warning', 'warning', 'warning', 'warning']
 
 [NODE] format_output — assembling final review...
 ==== CODE REVIEW REPORT ====
-🟢 [SUGGESTION] Your code has been rated at 10.00/10 (previous run: 0.00/10, +10.00)
----------------------------------------------------
+🟡 [WARNING] line 5: Shell injection risk: subprocess called with shell=True and user input
+line 7: Hardcoded credential detected: va
    Source: static_analysis_tool
 🟡 [WARNING] No test files found in project. Function 'run_command' is untested.
    Source: test_coverage_tool
+🟡 [WARNING] No test files found in project. Function 'get_password' is untested.
+   Source: test_coverage_tool
+🟡 [WARNING] subprocess: Spawn and manage subprocesses; use with caution — shell injection risk if inputs are unsanitized.
+   Source: docs_fetch_tool
+🟡 [WARNING] os: Standard library for OS interaction: file paths, env vars, process management.
+   Source: docs_fetch_tool
 
 ===== PIPELINE COMPLETE =====

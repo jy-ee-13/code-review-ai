@@ -5,6 +5,7 @@ from peft import PeftModel, PeftConfig
 import os
 import warnings
 warnings.filterwarnings("ignore")
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"  # suppress loading bars
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "training", "severity_model")
 BASE_MODEL = "microsoft/phi-2"
